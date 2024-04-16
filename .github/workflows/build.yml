@@ -21,21 +21,9 @@ jobs:
         run: chmod +x ./gradlew
       - name: build prod
         run: ./gradlew app:assembleRelease
-      - uses: r0adkll/sign-android-release@v1
-        name: Sign app APK
-        # ID used to access action output
-        id: sign_app
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.KEYSTORE }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-        env:
-          # override default build-tools version (33.0.0) -- optional
-          BUILD_TOOLS_VERSION: "34.0.0"
+        
       - name: Rename
-        run: mv app/build/outputs/apk/release/app-release-unsigned-signed.apk VolumeKeyMusicManagerModule-release.apk
+        run: mv app/build/outputs/apk/release/app-release-unsigned.apk VolumeKeyMusicManagerModule-release.apk
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
