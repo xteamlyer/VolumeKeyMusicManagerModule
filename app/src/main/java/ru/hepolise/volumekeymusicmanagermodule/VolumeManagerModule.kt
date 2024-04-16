@@ -57,7 +57,7 @@ class VolumeManagerModule : IXposedHookLoadPackage {
         private const val CLASS_IWINDOW_MANAGER = "android.view.IWindowManager"
         private const val CLASS_WINDOW_MANAGER_FUNCS =
             "com.android.server.policy.WindowManagerPolicy.WindowManagerFuncs"
-        private const val DEBUG = true
+        private const val DEBUG = false
         private var mIsLongPress = false
         private var mIsDownPressed = false
         private var mIsUpPressed = false
