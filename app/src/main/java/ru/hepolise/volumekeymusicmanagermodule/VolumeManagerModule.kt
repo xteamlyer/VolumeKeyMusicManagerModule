@@ -7,7 +7,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.PowerManager
 import android.os.SystemClock
-import android.util.Log
+// import android.util.Log
 import android.view.KeyEvent
 import android.view.ViewConfiguration
 import androidx.annotation.Keep
@@ -65,9 +65,9 @@ class VolumeManagerModule : IXposedHookLoadPackage {
         //    private static int mButtonsPressed = 0;
         private lateinit var mAudioManager: AudioManager
         private lateinit var mPowerManager: PowerManager
-        private fun log(text: String) {
-            if (DEBUG) XposedBridge.log(text)
-        }
+        // private fun log(text: String) {
+        //     if (DEBUG) XposedBridge.log(text)
+        // }
 
         private val handleInterceptKeyBeforeQueueing: XC_MethodHook = object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
@@ -81,27 +81,27 @@ class VolumeManagerModule : IXposedHookLoadPackage {
                     if (event.action == KeyEvent.ACTION_DOWN) {
                         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) mIsDownPressed = true
                         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) mIsUpPressed = true
-                        log("down action received, down: $mIsDownPressed, up: $mIsUpPressed")
+                        // log("down action received, down: $mIsDownPressed, up: $mIsUpPressed")
                         mIsLongPress = false
                         if (mIsUpPressed && mIsDownPressed) {
-                            log("aborting delayed skip")
+                            // log("aborting delayed skip")
                             handleVolumeSkipPressAbort(param.thisObject)
                         } else {
                             // only one button pressed
                             if (isMusicActive) {
-                                log("music is active, creating delayed skip")
+                                // log("music is active, creating delayed skip")
                                 handleVolumeSkipPress(param.thisObject, keyCode)
                             }
-                            log("creating delayed play pause")
+                            // log("creating delayed play pause")
                             handleVolumePlayPausePress(param.thisObject)
                         }
                     } else {
                         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) mIsDownPressed = false
                         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) mIsUpPressed = false
-                        log("up action received, down: $mIsDownPressed, up: $mIsUpPressed")
+                        // log("up action received, down: $mIsDownPressed, up: $mIsUpPressed")
                         handleVolumeAllPressAbort(param.thisObject)
                         if (!mIsLongPress && isMusicActive) {
-                            log("adjusting music volume")
+                            // log("adjusting music volume")
                             mAudioManager.adjustStreamVolume(
                                 AudioManager.STREAM_MUSIC,
                                 if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) AudioManager.ADJUST_RAISE else AudioManager.ADJUST_LOWER,
@@ -116,22 +116,22 @@ class VolumeManagerModule : IXposedHookLoadPackage {
         private val handleConstructPhoneWindowManager: XC_MethodHook = object : XC_MethodHook() {
             override fun afterHookedMethod(param: MethodHookParam) {
                 val mVolumeUpLongPress = Runnable {
-                    log("sending next")
+                    // log("sending next")
                     mIsLongPress = true
                     sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_NEXT)
                 }
                 val mVolumeDownLongPress = Runnable {
-                    log("sending prev")
+                    // log("sending prev")
                     mIsLongPress = true
                     sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
                 }
                 val mVolumeBothLongPress = Runnable {
                     if (mIsUpPressed && mIsDownPressed) {
-                        log("sending play/pause")
+                        // log("sending play/pause")
                         mIsLongPress = true
                         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
                     } else {
-                        log("NOT sending play/pause, down: $mIsDownPressed, up: $mIsUpPressed")
+                        // log("NOT sending play/pause, down: $mIsDownPressed, up: $mIsUpPressed")
                     }
                 }
                 XposedHelpers.setAdditionalInstanceField(
@@ -171,8 +171,8 @@ class VolumeManagerModule : IXposedHookLoadPackage {
                         ) as Boolean
                     ) return true
                 } catch (t: Throwable) {
-                    t.localizedMessage?.let { Log.e("xposed", it) }
-                    t.printStackTrace()
+                    // t.localizedMessage?.let { Log.e("xposed", it) }
+                    // t.printStackTrace()
                 }
                 return false
             }
@@ -192,8 +192,8 @@ class VolumeManagerModule : IXposedHookLoadPackage {
             try {
                 mAudioManager.dispatchMediaKeyEvent(keyEvent)
             } catch (t: Throwable) {
-                t.localizedMessage?.let { Log.e("xposed", it) }
-                t.printStackTrace()
+                // t.localizedMessage?.let { Log.e("xposed", it) }
+                // t.printStackTrace()
             }
         }
 
@@ -226,7 +226,7 @@ class VolumeManagerModule : IXposedHookLoadPackage {
         }
 
         private fun handleVolumeSkipPressAbort(phoneWindowManager: Any) {
-            log("aborting skip")
+            // log("aborting skip")
             val mHandler = XposedHelpers.getObjectField(phoneWindowManager, "mHandler") as Handler
             val mVolumeUpLongPress = XposedHelpers.getAdditionalInstanceField(
                 phoneWindowManager,
@@ -241,7 +241,7 @@ class VolumeManagerModule : IXposedHookLoadPackage {
         }
 
         private fun handleVolumePlayPausePressAbort(phoneWindowManager: Any) {
-            log("aborting play/pause")
+            // log("aborting play/pause")
             val mHandler = XposedHelpers.getObjectField(phoneWindowManager, "mHandler") as Handler
             val mVolumeBothLongPress = XposedHelpers.getAdditionalInstanceField(
                 phoneWindowManager,
@@ -251,7 +251,7 @@ class VolumeManagerModule : IXposedHookLoadPackage {
         }
 
         private fun handleVolumeAllPressAbort(phoneWindowManager: Any) {
-            log("aborting all")
+            // log("aborting all")
             handleVolumePlayPausePressAbort(phoneWindowManager)
             handleVolumeSkipPressAbort(phoneWindowManager)
         }
