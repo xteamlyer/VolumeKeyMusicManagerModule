@@ -1,35 +1,20 @@
-name: Build Release App Bundle
+name: Main
 
-on: 
+on:
   workflow_dispatch:
-     inputs:
-      build-type:
-        type: choice
-        description: Build Type
-        options:
-        - debug
-        - release
-  workflow_call:
-     inputs:
-      build-type:
-        required: false
-        type: string
   push:
-    branches:
-      - main
-      - dev
 
 env:
-  BUILD_TYPE: ${{ inputs.build-type || 'debug' }}
+  BUILD_TYPE: ${{ inputs.build-type || 'release' }}
   APK_DIR: app/build/outputs/apk
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
       - name: set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -55,19 +40,11 @@ jobs:
       - name: Rename release apk
         if: ${{ env.BUILD_TYPE == 'release' }}
         run: mv ${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}/app-release-unsigned.apk ${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}/app-${{ env.BUILD_TYPE }}.apk
-      - name: Sign app APK
-        uses: kevin-david/zipalign-sign-android-release@main
-        id: sign_app
-        with:
-          releaseDirectory: ${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}
-          signingKeyBase64: ${{ secrets.KEYSTORE }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
       - name: Rename
-        run: mv ${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}/app-${{ env.BUILD_TYPE }}-signed.apk VolumeKeyMusicManagerModule-${{ env.BUILD_TYPE }}-${{ env.VERSION }}.apk
+        run: mv ${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}/app-${{ env.BUILD_TYPE }}.apk VolumeKeyMusicManagerModule-${{ env.BUILD_TYPE }}-${{ env.VERSION }}.apk
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
         with:
           name: Build Artifacts
           path: VolumeKeyMusicManagerModule-${{ env.BUILD_TYPE }}-${{ env.VERSION }}.apk
