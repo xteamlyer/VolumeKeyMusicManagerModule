@@ -1,26 +1,12 @@
 name: Build Release App Bundle
 
-on: 
+on:
   workflow_dispatch:
-     inputs:
-      build-type:
-        type: choice
-        description: Build Type
-        options:
-        - debug
-        - release
   workflow_call:
-     inputs:
-      build-type:
-        required: false
-        type: string
   push:
-    branches:
-      - main
-      - dev
 
 env:
-  BUILD_TYPE: ${{ inputs.build-type || 'debug' }}
+  BUILD_TYPE: release
   APK_DIR: app/build/outputs/apk
   APK_NAME: VolumeKeyTrackControlModule
 
@@ -56,19 +42,8 @@ jobs:
       - name: Rename release apk
         if: ${{ env.BUILD_TYPE == 'release' }}
         run: mv ${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}/app-release-unsigned.apk ${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}/app-${{ env.BUILD_TYPE }}.apk
-      - name: Sign app APK
-        uses: kevin-david/zipalign-sign-android-release@main
-        id: sign_app
-        with:
-          releaseDirectory: ${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}
-          signingKeyBase64: ${{ secrets.KEYSTORE }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-      - name: Rename
-        run: mv ${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}/app-${{ env.BUILD_TYPE }}-signed.apk ${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}.apk
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: Build Artifacts
-          path: ${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}.apk
+          name: VolumeKey
+          path: ${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}/app-${{ env.BUILD_TYPE }}.apk
