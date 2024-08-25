@@ -11,6 +11,7 @@ Integer versionCode = 5
 rootProject.ext.set("appVersionName", versionName)
 rootProject.ext.set("appVersionCode", versionCode)
 
+
 tasks.register("getVersion") {
     doLast {
         File versionFile = new File("app/build/version.txt")
