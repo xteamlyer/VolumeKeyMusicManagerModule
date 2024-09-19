@@ -3,7 +3,6 @@ package ru.hepolise.volumekeytrackcontrolmodule
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
-import android.os.Build
 import android.os.Handler
 import android.os.PowerManager
 import android.os.SystemClock
@@ -20,26 +19,34 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 class VolumeControlModule : IXposedHookLoadPackage {
     @Throws(Throwable::class)
     override fun handleLoadPackage(lpparam: LoadPackageParam) {
+        if (lpparam.packageName != "android") {
+            return
+        }
         init(lpparam.classLoader)
     }
 
     private fun init(classLoader: ClassLoader) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            // https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-14.0.0_r18/services/core/java/com/android/server/policy/PhoneWindowManager.java#2033
+        try {
             XposedHelpers.findAndHookMethod(
                 CLASS_PHONE_WINDOW_MANAGER, classLoader, "init",
-                Context::class.java, CLASS_WINDOW_MANAGER_FUNCS, handleConstructPhoneWindowManager
-            )
-        } else {
-            // https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android13-dev/services/core/java/com/android/server/policy/PhoneWindowManager.java#1873
-            XposedHelpers.findAndHookMethod(
-                CLASS_PHONE_WINDOW_MANAGER, classLoader, "init",
-                Context::class.java, CLASS_IWINDOW_MANAGER, CLASS_WINDOW_MANAGER_FUNCS,
+                Context::class.java, CLASS_WINDOW_MANAGER_FUNCS, CLASS_IWINDOW_MANAGER,
                 handleConstructPhoneWindowManager
             )
+        } catch (e1: NoSuchMethodError) {
+            try {
+                XposedHelpers.findAndHookMethod(
+                    CLASS_PHONE_WINDOW_MANAGER, classLoader, "init",
+                    Context::class.java, CLASS_WINDOW_MANAGER_FUNCS,
+                    handleConstructPhoneWindowManager
+                )
+            } catch (e2: NoSuchMethodError) {
+                XposedHelpers.findAndHookMethod(
+                    CLASS_PHONE_WINDOW_MANAGER, classLoader, "init",
+                    Context::class.java, CLASS_IWINDOW_MANAGER, CLASS_WINDOW_MANAGER_FUNCS,
+                    handleConstructPhoneWindowManager
+                )
+            }
         }
-
-        // https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-14.0.0_r18/services/core/java/com/android/server/policy/PhoneWindowManager.java#4117
         XposedHelpers.findAndHookMethod(
             CLASS_PHONE_WINDOW_MANAGER,
             classLoader,
@@ -60,7 +67,6 @@ class VolumeControlModule : IXposedHookLoadPackage {
         private var mIsDownPressed = false
         private var mIsUpPressed = false
 
-        //    private static int mButtonsPressed = 0;
         private lateinit var mAudioManager: AudioManager
         private lateinit var mPowerManager: PowerManager
 
@@ -77,7 +83,6 @@ class VolumeControlModule : IXposedHookLoadPackage {
                         if (mIsUpPressed && mIsDownPressed) {
                             handleVolumeSkipPressAbort(param.thisObject)
                         } else {
-                            // only one button pressed
                             if (isMusicActive) {
                                 handleVolumeSkipPress(param.thisObject, keyCode)
                             }
@@ -149,9 +154,7 @@ class VolumeControlModule : IXposedHookLoadPackage {
 
         private val isMusicActive: Boolean
             get() {
-                // check local
                 if (mAudioManager.isMusicActive) return true
-                // check remote
                 try {
                     if (XposedHelpers.callMethod(
                             mAudioManager,
