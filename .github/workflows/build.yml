@@ -1,30 +1,13 @@
 name: Build Release App Bundle
 
-on: 
+on:
   workflow_dispatch:
-     inputs:
-      build-type:
-        type: choice
-        description: Build Type
-        options:
-        - debug
-        - release
   workflow_call:
-     inputs:
-      build-type:
-        required: false
-        type: string
   push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
-      - dev
-      - test
 
 env:
-  BUILD_TYPE: ${{ inputs.build-type || 'debug' }}
+  BUILD_TYPE: ${{ inputs.build-type || 'release' }}
   APK_DIR: app/build/outputs/apk
   APK_NAME: VolumeKeyTrackControlModule
 
