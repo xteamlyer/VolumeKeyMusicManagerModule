@@ -36,17 +36,23 @@ android {
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:2.1.20"))
-    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.core:core-ktx:1.16.0")
 
     // Compose BOM (Bill of Materials)
-    implementation(platform("androidx.compose:compose-bom:2025.03.01"))
+    implementation(platform("androidx.compose:compose-bom:2025.04.00"))
 
     // Compose dependencies
     implementation("androidx.activity:activity-compose:1.10.1")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.compose.material3:material3:1.3.2")
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // Compose navigation
+    implementation("androidx.navigation:navigation-compose:2.8.9")
+
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
     // Required for preview support
     debugImplementation("androidx.compose.ui:ui-tooling")
