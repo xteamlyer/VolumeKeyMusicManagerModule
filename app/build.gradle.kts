@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,12 +7,12 @@ plugins {
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ru.hepolise.volumekeymusicmanagermodule"
         minSdk = 27
-        targetSdk = 35
+        targetSdk = 36
         versionCode = rootProject.ext["appVersionCode"].toString().toInt()
         versionName = rootProject.ext["appVersionName"].toString()
     }
@@ -27,16 +29,21 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 
     namespace = "ru.hepolise.volumekeytrackcontrolmodule"
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:2.2.10"))
-    implementation("androidx.core:core-ktx:1.16.0")
+    implementation("androidx.core:core-ktx:1.17.0")
 
     // Compose BOM (Bill of Materials)
     implementation(platform("androidx.compose:compose-bom:2025.08.00"))
