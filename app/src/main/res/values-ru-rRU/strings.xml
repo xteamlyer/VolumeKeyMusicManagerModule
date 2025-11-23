@@ -23,6 +23,8 @@
     <string name="vibration_amplitude_dialog_title">Амплитуда вибрации</string>
     <string name="test_vibration">Проверить вибрацию</string>
 
+    <string name="vibration_not_available">Вибрация недоступна на этом устройстве</string>
+
     <string name="app_filter">Фильтр приложений</string>
     <string name="app_filter_disabled">Выключен</string>
     <string name="app_filter_white_list">Разрешить</string>
@@ -51,6 +53,13 @@
     <string name="long_press_duration_dialog_title">Длительность долгого нажатия</string>
 
     <string name="swap_buttons">Поменять кнопки Вверх/Вниз для переключения</string>
+
+    <string name="track_change">Переключение трека</string>
+    <string name="long_press_action">Действие при долгом нажатии</string>
+    <string name="rewind">Перемотка</string>
+    <string name="rewind_duration">Длительность перемотки: %d сек</string>
+    <string name="rewind_duration_dialog_title">Установить длительность перемотки</string>
+    <string name="edit_rewind_duration">Изменить длительность перемотки</string>
 
     <string name="settings_reset">Сбросить настройки</string>
     <string name="settings_reset_message">Вы уверены, что хотите сбросить настройки?</string>
