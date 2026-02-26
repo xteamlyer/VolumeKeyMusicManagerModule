@@ -203,7 +203,7 @@ object VolumeKeyControlModuleHandlers {
         abortAll()
         if (!isLongPress && getMediaController().isMusicActive()) {
             log("Adjusting stream volume")
-            keyHelper.adjustStreamVolume(audioManager)
+            keyHelper.adjustStreamVolume(this)
         }
     }
 
@@ -370,23 +370,32 @@ object VolumeKeyControlModuleHandlers {
             }
         }
 
-        fun adjustStreamVolume(audioManager: AudioManager) {
+        fun adjustStreamVolume(param: MethodHookParam) {
             try {
-                val direction = when (origKey) {
-                    Key.UP -> KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_VOLUME_UP)
-                    Key.DOWN -> KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_VOLUME_DOWN)
+                val keyCode = when (origKey) {
+                    Key.UP -> KeyEvent.KEYCODE_VOLUME_UP
+                    Key.DOWN -> KeyEvent.KEYCODE_VOLUME_DOWN
                 }
 
-                XposedHelpers.callMethod(
-                    sessionHelper,
-                    "sendVolumeKeyEvent",
-                    arrayOf(
-                        KeyEvent::class.java,
-                        Int::class.javaPrimitiveType,
-                        Boolean::class.javaPrimitiveType
-                    ),
-                    direction, AudioManager.USE_DEFAULT_STREAM_TYPE, false
-                )
+                fun sendEvent(action: Int) {
+                    XposedHelpers.callMethod(
+                        sessionHelper,
+                        "sendVolumeKeyEvent",
+                        arrayOf(
+                            KeyEvent::class.java,
+                            Int::class.javaPrimitiveType,
+                            Boolean::class.javaPrimitiveType
+                        ),
+                        KeyEvent(action, keyCode),
+                        AudioManager.USE_DEFAULT_STREAM_TYPE,
+                        false
+                    )
+                }
+
+                sendEvent(KeyEvent.ACTION_DOWN)
+                param.getHandler().postDelayed({
+                    sendEvent(KeyEvent.ACTION_UP)
+                }, 20)
             } catch (e: Exception) {
                 log("Failed to adjust stream volume: ${e.message}")
                 log("Falling back to adjustStreamVolume")
