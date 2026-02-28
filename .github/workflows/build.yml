@@ -114,3 +114,11 @@ jobs:
         with:
           path: ${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}-${{ env.SHORT_SHA }}.apk
           archive: false
+
+      - name: Set artifact output
+        id: set-output
+        run: |
+          echo "artifact_name=${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}-${{ env.SHORT_SHA }}.apk" >> $GITHUB_OUTPUT
+
+    outputs:
+     artifact-name: ${{ steps.set-output.outputs.artifact_name }}
