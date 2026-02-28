@@ -20,7 +20,7 @@ jobs:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v8
         with:
-          name: Build Artifacts    
+          name: ${{ needs.call-build.outputs.artifact-name }}
 
       - name: Extract APK Version
         id: apk_version
