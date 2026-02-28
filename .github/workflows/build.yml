@@ -14,6 +14,9 @@ on:
       build-type:
         required: false
         type: string
+    outputs:
+      artifact-name:
+        value: ${{ jobs.build.outputs.artifact-name }}
   push:
     branches:
       - main
@@ -31,6 +34,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.set-output.outputs.artifact_name }}
     steps:
       - uses: actions/checkout@v6
 
@@ -114,3 +119,8 @@ jobs:
         with:
           path: ${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}-${{ env.SHORT_SHA }}.apk
           archive: false
+
+      - name: Set artifact output
+        id: set-output
+        run: |
+          echo "artifact_name=${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}-${{ env.SHORT_SHA }}.apk" >> $GITHUB_OUTPUT
