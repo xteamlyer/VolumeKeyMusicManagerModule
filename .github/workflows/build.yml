@@ -14,6 +14,9 @@ on:
       build-type:
         required: false
         type: string
+    outputs:
+        artifact-name:
+         value: ${{ jobs.build.outputs.artifact-name }}
   push:
     branches:
       - main
