@@ -112,5 +112,5 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
+          path: ${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}-${{ env.SHORT_SHA }}.apk
           archive: false
-          path: ${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}.apk
