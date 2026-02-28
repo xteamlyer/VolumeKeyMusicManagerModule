@@ -95,17 +95,22 @@ jobs:
           keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
 
+      - name: Get short commit SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Rename
         run: |
           APK_DIR="${{ env.APK_DIR }}/${{ env.BUILD_TYPE }}"
+          OUTPUT_NAME="${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}-${{ env.SHORT_SHA }}.apk"
+
           if [ -f "$APK_DIR/app-${{ env.BUILD_TYPE }}-signed.apk" ]; then
-            mv "$APK_DIR/app-${{ env.BUILD_TYPE }}-signed.apk" "${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}.apk"
+            mv "$APK_DIR/app-${{ env.BUILD_TYPE }}-signed.apk" "$OUTPUT_NAME"
           else
-            mv "$APK_DIR/app-${{ env.BUILD_TYPE }}.apk" "${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}.apk"
+            mv "$APK_DIR/app-${{ env.BUILD_TYPE }}.apk" "$OUTPUT_NAME"
           fi
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: Build Artifacts
+          archive: false
           path: ${{ env.APK_NAME }}-${{ env.BUILD_TYPE }}-${{ env.VERSION }}.apk
