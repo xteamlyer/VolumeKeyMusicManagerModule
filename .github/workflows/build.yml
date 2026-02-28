@@ -15,7 +15,7 @@ on:
         required: false
         type: string
     outputs:
-        artifact-name:
+      artifact-name:
          value: ${{ jobs.build.outputs.artifact-name }}
   push:
     branches:
